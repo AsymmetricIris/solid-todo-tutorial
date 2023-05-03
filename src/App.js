@@ -1,6 +1,8 @@
 //App.js
 
+import AddToDo from "../src/components/AddTodo";
 import React, { useEffect, useState } from "react";
+
 import { 
   LoginButton,
   LogoutButton,
@@ -36,6 +38,9 @@ function App() {
               ]} />
           </div>
           <LogoutButton />
+          <section>
+            <AddToDo />
+          </section>
         </CombinedDataProvider>
       ) : (
         <div className="message">
