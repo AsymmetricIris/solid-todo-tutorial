@@ -8,6 +8,7 @@ import {
     getThingAll, 
     getUrl,
     removeDatetime,
+    removeThing,
     saveSolidDatasetAt,
     setThing,
  } from "@inrupt/solid-client";
@@ -66,6 +67,15 @@ function TodoList({ todoList, setTodoList }) {
     setTodoList(updatedList);
   };
 
+  const deleteTodo = async (todo) => {
+    const todosUrl = getSourceUrl(todoList);
+    const updatedTodos = removeThing(todoList, todo);
+    const updatedDataset = await saveSolidDatasetAt(todosUrl, updatedTodos, {
+      fetch,
+    });
+    setTodoList(updatedDataset);
+  };
+
   const thingsArray = todoThings
     .filter((t) => getUrl(t, TYPE_PREDICATE) === TODO_CLASS)
     .map((t) => {
@@ -81,21 +91,35 @@ function TodoList({ todoList, setTodoList }) {
       <Table className="table" things={thingsArray}>
         <TableColumn property={TEXT_PREDICATE} header="To Do" sortable />
         <TableColumn
-          property={CREATED_PREDICATE}
-          dataType="datetime"
-          header="Created At"
-          body={({ value }) => value.toDateString()}
-          sortable
+            property={CREATED_PREDICATE}
+            dataType="datetime"
+            header="Created At"
+            body={({ value }) => value.toDateString()}
+            sortable
         />
         <TableColumn
-          property={COMPLETED_PREDICATE}
-          dataType="datetime"
-          header="Done"
-          body={({ value }) => <CompletedBody checked={Boolean(value)} handleCheck={handleCheck} />}
+            property={COMPLETED_PREDICATE}
+            dataType="datetime"
+            header="Done"
+            body={({ value }) => <CompletedBody checked={Boolean(value)} handleCheck={handleCheck} />}
+        />
+        <TableColumn
+            property={TEXT_PREDICATE}
+            header=""
+            body={() => <DeleteButton deleteTodo={deleteTodo} />}
         />
       </Table>
     </div>
   );
 }
+
+function DeleteButton({ deleteTodo }) {
+    const { thing } = useThing();
+    return (
+      <button className="delete-button" onClick={() => deleteTodo(thing)}>
+        Delete
+      </button>
+    );
+  }
 
 export default TodoList;
